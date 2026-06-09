@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Vendex Migration Progress Tracker", 
+  description = "A cozy, minimalistic dashboard to track the progress and details of the Vendex systems sanitization and refactoring." 
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Vendex Migration Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- inline script to prevent dark theme flicker -->
+    <script is:inline>
+      const getTheme = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+      document.documentElement.setAttribute('data-theme', getTheme());
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

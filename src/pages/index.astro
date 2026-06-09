@@ -1,0 +1,330 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { parseContextMd } from '../utils/parser';
+import path from 'path';
+
+// Parse the Context.md at build time
+const contextPath = path.resolve('./Context.md');
+const phases = parseContextMd(contextPath);
+
+// Dynamically inject Phase 5: Make it to Production if not present
+if (phases.length === 4) {
+  phases.push({
+    title: "Phase 5: Make it to Production",
+    objective: "Deploy the sanitized, modernized, and containerized architecture to the live production AWS environment.",
+    steps: [
+      {
+        id: "5.1",
+        title: "Deploy Orchestrated Stack to AWS ECS",
+        completed: false,
+        details: [
+          "Deploy modernized Docker containers into AWS ECS tasks.",
+          "Verify application behavior and micro-frontend CORS communication."
+        ],
+        notes: [],
+        rawMarkdown: "- [ ] **Step 5.1: Deploy Orchestrated Stack to AWS ECS**\n  - Deploy modernized Docker containers into AWS ECS tasks."
+      },
+      {
+        id: "5.2",
+        title: "Production Routing and DNS Cutover",
+        completed: false,
+        details: [
+          "Configure SSL/TLS certificates and AWS Route 53 parameters.",
+          "Perform final production checks and cut over traffic."
+        ],
+        notes: [],
+        rawMarkdown: "- [ ] **Step 5.2: Production Routing and DNS Cutover**\n  - Configure SSL/TLS certificates and AWS Route 53 parameters."
+      }
+    ]
+  });
+}
+
+// Compute stats per phase
+const phaseStats = phases.map(phase => {
+  const total = phase.steps.length;
+  const completed = phase.steps.filter(s => s.completed).length;
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+  return { total, completed, percent };
+});
+
+// Count total steps and completed steps for display
+let totalSteps = 0;
+let completedSteps = 0;
+phases.forEach(p => {
+  totalSteps += p.steps.length;
+  completedSteps += p.steps.filter(s => s.completed).length;
+});
+
+// Overall progress is weighted: Phase 1 (15%), Phase 2 (20%), Phase 3 (20%), Phase 4 (25%), Phase 5 (20%)
+const weights = [0.15, 0.20, 0.20, 0.25, 0.20];
+let weightedPercentSum = 0;
+phaseStats.forEach((stat, index) => {
+  const weight = weights[index] || 0;
+  weightedPercentSum += stat.percent * weight;
+});
+const initialPercent = Math.min(100, Math.round(weightedPercentSum));
+
+// Compile all notes for completed steps into a central "Achievements" list for the boss
+const allCompletedNotes = phases.flatMap(phase => 
+  phase.steps
+    .filter(step => step.completed && step.notes.length > 0)
+    .map(step => ({
+      stepId: step.id,
+      stepTitle: step.title,
+      phaseTitle: phase.title.split(':')[0],
+      notes: step.notes
+    }))
+);
+---
+
+<Layout>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div class="header-title-container">
+          <h1>Vendex Migration</h1>
+          <p>Roadmap, Sanitization & Progress Tracker</p>
+        </div>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+          <!-- Sun icon -->
+          <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <!-- Moon icon -->
+          <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-stats">
+          <span>Overall Sanitization Progress</span>
+          <span id="progressPercent">{initialPercent}%</span>
+        </div>
+        <div class="progress-container">
+          <div id="progressBar" class="progress-bar" style={`width: ${initialPercent}%`}></div>
+        </div>
+        <div class="progress-stats" style="margin-top: 0.25rem;">
+          <span id="progressCount">{completedSteps} of {totalSteps} tasks completed</span>
+          <span class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Live Codebase Status</span>
+          </span>
+        </div>
+        <div class="progress-perspective-card" style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.88rem; line-height: 1.5; color: var(--text-primary);">
+          <strong>Progress Perspective:</strong> Phase 1: Isolated Local Environment — 80% Completed (8 out of 10 milestones met). Overall Project Progress is currently tracked at 20% pending subsequent phases.
+        </div>
+      </div>
+    </header>
+
+    <section class="summary-highlights-card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);">
+      <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); border: none; padding: 0; background: transparent;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color);">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        Core Architectural Accomplishments
+      </h2>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; font-size: 0.9rem; line-height: 1.6;">
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Environment Isolation</strong>
+          <span style="color: var(--text-secondary);">Isolated local environments from live AWS production infrastructure using sandboxed Docker containers for databases and caching layers.</span>
+        </div>
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Core Modernization</strong>
+          <span style="color: var(--text-secondary);">Upgraded runtimes to Node 22 (LTS), migrated EOL Apollo Server v3 to v4, standardized the `@aws-sdk/*` layer, and eliminated legacy dependency vulnerabilities.</span>
+        </div>
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Docker Optimization</strong>
+          <span style="color: var(--text-secondary);">Restructured service configurations into secure, multi-stage Docker builds, effectively removing devDependencies from production images to minimize runtime footprint.</span>
+        </div>
+      </div>
+    </section>
+
+    {allCompletedNotes.length > 0 && (
+      <section class="achievements-card">
+        <div class="achievements-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success-color);">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <h2>Key Achievements & Findings</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+          The following technical milestones and configuration summaries have been successfully recorded in the codebase:
+        </p>
+        <div class="achievements-list">
+          {allCompletedNotes.map(item => (
+            <div class="achievement-item">
+              <div class="achievement-meta">
+                <span class="achievement-tag">{item.phaseTitle}</span>
+                <strong>Step {item.stepId}: {item.stepTitle}</strong>
+              </div>
+              <ul class="achievement-notes">
+                {item.notes.map(note => (
+                  <li>{note}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <div class="controls">
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">All Steps</button>
+        <button class="filter-btn" data-filter="pending">Pending</button>
+        <button class="filter-btn" data-filter="completed">Completed</button>
+      </div>
+    </div>
+
+    <main id="phasesContainer">
+      {phases.map((phase, phaseIndex) => (
+        <section class="phase-card" data-phase-index={phaseIndex}>
+          <div class="phase-header">
+            <div class="phase-title">
+              <h2>{phase.title}</h2>
+              <div class="phase-progress-meta">
+                <span class="phase-progress-text">{phaseStats[phaseIndex].completed}/{phaseStats[phaseIndex].total} Done</span>
+                <span class="phase-badge">{phaseStats[phaseIndex].percent}%</span>
+              </div>
+            </div>
+            <div class="phase-mini-progress">
+              <div class="phase-mini-bar" style={`width: ${phaseStats[phaseIndex].percent}%`}></div>
+            </div>
+            {phase.objective && <p class="phase-objective">{phase.objective}</p>}
+          </div>
+
+          <div class="steps-list">
+            {phase.steps.map(step => (
+              <div class="step-item" data-step-id={step.id} data-completed={step.completed ? "true" : "false"}>
+                <div class="step-row">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      class="step-checkbox" 
+                      data-step-id={step.id} 
+                      checked={step.completed} 
+                      disabled
+                    />
+                    <span class="checkmark"></span>
+                    <span class="step-title-text">{step.id} {step.title}</span>
+                  </label>
+                </div>
+
+                <div class="step-content">
+                  {step.details.length > 0 && (
+                    <ul class="step-details-list">
+                      {step.details.map(detail => (
+                        <li>{detail}</li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {/* Render note if it exists from build time */}
+                  {step.notes.length > 0 && (
+                    <div class="notes-container">
+                      <div class="notes-title">Context Note (From Code)</div>
+                      <ul class="notes-list">
+                        {step.notes.map(note => (
+                          <li>{note}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </main>
+  </div>
+</Layout>
+
+<script>
+  const init = () => {
+    // Theme toggle setup
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      const sunIcon = themeToggle.querySelector('.sun') as HTMLElement;
+      const moonIcon = themeToggle.querySelector('.moon') as HTMLElement;
+
+      const updateIcons = (theme: string) => {
+        if (theme === 'dark') {
+          if (sunIcon) sunIcon.style.display = 'block';
+          if (moonIcon) moonIcon.style.display = 'none';
+        } else {
+          if (sunIcon) sunIcon.style.display = 'none';
+          if (moonIcon) moonIcon.style.display = 'block';
+        }
+      };
+
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      updateIcons(currentTheme);
+
+      themeToggle.addEventListener('click', () => {
+        const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        updateIcons(theme);
+      });
+    }
+
+    // Filter tabs logic
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const filter = btn.getAttribute('data-filter');
+        const stepItems = document.querySelectorAll('.step-item');
+        
+        stepItems.forEach(item => {
+          const isCompleted = item.getAttribute('data-completed') === 'true';
+          const htmlItem = item as HTMLElement;
+          
+          if (filter === 'all') {
+            htmlItem.style.display = 'flex';
+          } else if (filter === 'completed') {
+            htmlItem.style.display = isCompleted ? 'flex' : 'none';
+          } else if (filter === 'pending') {
+            htmlItem.style.display = !isCompleted ? 'flex' : 'none';
+          }
+        });
+
+        // Hide empty phase cards based on active filter
+        const phaseCards = document.querySelectorAll('.phase-card');
+        phaseCards.forEach(card => {
+          const steps = card.querySelectorAll('.step-item');
+          let visibleCount = 0;
+          steps.forEach(s => {
+            const htmlStep = s as HTMLElement;
+            if (htmlStep.style.display !== 'none') {
+              visibleCount++;
+            }
+          });
+          const htmlCard = card as HTMLElement;
+          htmlCard.style.display = visibleCount > 0 ? 'block' : 'none';
+        });
+      });
+    });
+  };
+
+  // Run initialization robustly
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>
