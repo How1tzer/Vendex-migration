@@ -9,7 +9,7 @@ The system is a multi-tenant financial SaaS platform based on a Micro-Frontend a
 ### Frontends (React):
 - `vendex-web-client` (Port 3000): Main Shell/Application application. React 16.8, Node 14. Deploys via AWS Amplify. High-priority target for security sanitization due to being stale.
 - `vkey2-frontend` (Port 3002): Document management and analytics module. React 18.2, Webpack 5, Node 16 (outdated Docker base). Uses pnpm.
-- `user-registry-frontend` (Port 3002): User management interface. React 18.2, Webpack 5, Node 20. Uses npm.
+- `user-registry-frontend` (Port 3003): User management interface. React 18.2, Webpack 5, Node 20. Uses npm.
 
 ### Backends (Node.js + TypeScript):
 - `vendex-backend-service` (Port 3000): Legacy core (VSource/VLink). Koa 2, Knex (Query builder/Migrations), Node 20. Database: PostgreSQL + DynamoDB (Legacy VKey1 data). Uses yarn.
@@ -114,9 +114,13 @@ The developer will update this checklist state using `[x]` as steps are complete
   - *Context Note (Completed):*
     - Created `local-env.env` pointing to local database via `host.docker.internal`.
     - Created `Password.md` and added to `.gitignore`.
-- [ ] **Step 1.4: Frontend Layer Coupling (vkey2-frontend & user-registry-frontend)**
+- [x] **Step 1.4: Frontend Layer Coupling (vkey2-frontend & user-registry-frontend)**
   - Clone `vkey2-frontend` (using pnpm) and `user-registry-frontend` (using npm).
-  - Correctly map local port bindings (`3002`) to ensure iframe postMessage communication isn't blocked by CORS.
+  - Correctly map local port bindings to ensure iframe postMessage communication isn't blocked by CORS.
+  - *Context Note (Completed):*
+    - Created local `.env` pointing backends to localhost mapping.
+    - Added `Password.md` to `.gitignore` to securely backup AWS credentials for future usage.
+    - **Port collision resolved**: Both frontends originally targeted port `3002`. `vkey2-frontend` retains `3002`; `user-registry-frontend` was moved to `3003` (`serve.js`, `Dockerfile EXPOSE`, and `webpack.config.js devServer.port` all updated). Docker host mapping must be `-p 3003:3003` for user-registry-frontend.
 - [ ] **Step 1.5: Global Local Orchestration**
   - Consolidate a master `docker-compose.yml` file to initialize the local architecture in the precise order mandated by the ECS cluster topology.
 - [x] **Step 1.6: Package Sanitization (user-registry-backend)**
@@ -159,11 +163,26 @@ The developer will update this checklist state using `[x]` as steps are complete
 
 ### PHASE 2: ENVIRONMENT DESKUPGRADES (NODE.JS & REACT)
 *Objective: Elevate obsolete code runtimes to modern, security-patched versions.*
-- [ ] **Step 2.1: Sanitizing the Shell Application (vendex-web-client)**
-  - Upgrade the main shell client from Node 14 / React 16.8 to Node 20 / React 18.
+- [x] **Step 2.1: Sanitizing the Shell Application (vendex-web-client)**
+  - Upgrade the main shell client from Node 14 to Node 22 / React newest version.
   - Resolve breaking changes across legacy trees (specifically the AWS Amplify SDK and Material-UI v4) while preserving original visual layouts.
-- [ ] **Step 2.2: Modernizing the Contracts Container (vkey2-frontend)**
-  - Update the outdated `node:16-alpine` base image in the Dockerfile to `node:20-alpine` to standardize cluster deployment models.
+  - *Context Note (Completed):*
+    - Upgraded runtime environment to Node 22 and added engines constraint.
+    - Moved type definition package `@types/tus-js-client` from dependencies to devDependencies, and added `@types/node`.
+    - Upgraded legacy dependency `axios` to `^1.7.9` to patch known security vulnerabilities.
+    - Transitioned package manager from Yarn to NPM by deleting `yarn.lock` and generating `package-lock.json` via `--legacy-peer-deps`.
+    - Added Express and created static server script `src/serve.js` to serve craco production outputs on port 3000.
+    - Provisioned production-ready multi-stage `Dockerfile` (Stage 1 builder, Stage 2 runner) and hot-reloaded `Dockerfile-dev`.
+    - Integrated standard local orchestration via `docker-compose.yml`.
+    - Created local `.env` mapping micro-frontend URLs and APIs to localhost ports (User Registry: 3003, VKey2: 3002, Core Catalog Backend: 5000), using `SKIP_PREFLIGHT_CHECK=true` and `NODE_OPTIONS=--openssl-legacy-provider` to resolve dependency preflight and OpenSSL 3 Webpack hashing constraints.
+    - Resolved missing AWS Amplify compilation check by provisioning a dummy `src/aws-exports.js` configuration.
+- [x] **Step 2.2: Modernizing the Contracts Container (vkey2-frontend)**
+  - Update the outdated `node:16-alpine` base image in the Dockerfile to `node:22-alpine` to standardize cluster deployment models.
+  - *Context Note (Completed):*
+    - Upgraded `Dockerfile` base image to `node:22-alpine`.
+    - Rewrote the Dockerfile into a multi-stage build to isolate the build environment from the production environment, drastically reducing the image footprint.
+    - Replaced `npm install` with `pnpm install` natively utilizing `corepack`, ensuring dependencies lock faithfully to the cluster's constraints.
+    - Appended `"engines": { "node": ">=22.0.0 <23.0.0" }` in `package.json` to enforce consistency.
 - [ ] **Step 2.3: Cross-Version Integration Testing**
   - Verify inside local Docker containers that runtime upgrades did not break token-passing mechanisms between the shell application and embedded iframes.
 

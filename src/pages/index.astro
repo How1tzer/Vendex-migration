@@ -90,7 +90,7 @@ const allCompletedNotes = phases.flatMap(phase =>
           </span>
         </div>
         <div class="progress-perspective-card" style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.88rem; line-height: 1.5; color: var(--text-primary);">
-          <strong>Progress Perspective:</strong> Phase 1: Isolated Local Environment — {phaseStats[0]?.percent}% Completed ({phases[0]?.steps.filter(s => s.completed).length} out of {phases[0]?.steps.length} milestones met). Overall Project Progress is currently tracked at {initialPercent}% pending subsequent phases.
+          <strong>Progress Perspective:</strong> Phase 1: Isolated Local Environment — {phaseStats[0]?.percent}% Completed ({phases[0]?.steps.filter(s => s.completed).length} out of {phases[0]?.steps.length} milestones met). Phase 2: Environment Deskupgrades — {phaseStats[1]?.percent}% Completed ({phases[1]?.steps.filter(s => s.completed).length} out of {phases[1]?.steps.length} milestones met). Overall Project Progress is currently tracked at {initialPercent}% pending subsequent phases.
         </div>
       </div>
     </header>
