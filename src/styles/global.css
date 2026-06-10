@@ -63,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Base utility container */
 .container {
-  max-width: 800px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1rem 4rem 1rem;
 }
@@ -544,4 +544,150 @@ header {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Two Column Layout Grid */
+.main-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .main-layout-grid {
+    grid-template-columns: 1.3fr 1fr;
+  }
+}
+
+/* Sidebar & Scope Cards */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: sticky;
+  top: 2rem;
+}
+
+.sidebar-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: var(--card-shadow);
+  transition: border-color var(--transition-speed) ease;
+}
+
+.sidebar-card h3 {
+  font-size: 1.25rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-card-title-border {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.objective-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.scope-split {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.scope-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scope-group h4 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.scope-group.in-scope h4 {
+  color: var(--success-color);
+}
+
+.scope-group.out-scope h4 {
+  color: var(--pending-color);
+}
+
+.scope-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.scope-list li {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.in-scope .scope-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+.out-scope .scope-list li::before {
+  content: "×";
+  position: absolute;
+  left: 0;
+  color: var(--pending-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+  top: -1px;
+}
+
+.deliverables-list, .assumptions-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.deliverables-list li, .assumptions-list li {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.deliverables-list li::before {
+  content: "📦";
+  position: absolute;
+  left: 0;
+  font-size: 0.85rem;
+}
+
+.assumptions-list li::before {
+  content: "💡";
+  position: absolute;
+  left: 0;
+  font-size: 0.85rem;
 }

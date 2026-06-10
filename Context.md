@@ -46,7 +46,42 @@ The system is a multi-tenant financial SaaS platform based on a Micro-Frontend a
 | `vdx-lab` | AWS Utilities & Scripts | 3.2 MB | 2024-09-19 | DB backup/restore code and standalone utilities. |
 | `vdx-sdk` | Shared Internal Library | -- | 2024-06-11 | Auth/Cache logic packaged in `.tgz` format. Highly fragile. |
 
-## 5. MIGRATION ROADMAP & CHECKLIST
+## 5. SCOPE OF WORK: VENDEX ENVIRONMENT MIGRATION
+
+### Objective
+Migrate the VendEx VSource, VKey, and VPort applications to a new development and hosting environment that is easier to maintain, deploy, secure, and scale. The migration will exclude VLink functionality and any VID-specific applications, classifiers, or workflows.
+
+### In Scope
+The work will include the migration and stabilization of the following core application components:
+- **VSource**: Migrate the vendor catalogue capabilities currently served through vendex-backend-service, including vendors, products, market segments, vendor financials, tickers, officers, locations, and corporate actions.
+- **VKey / VKey2**: Migrate the document management and extraction workflow currently supported by vkey2backend and vkey2-frontend, including secure file upload, document handling, document family groups, product purchases, purchase entries, document metadata, thumbnails, and related AWS processing workflows.
+- **VPort**: Migrate the portfolio analytics capabilities built on top of VKey2 data, including materialized portfolio views, vendor/product summaries, portfolio spend data, calendar events, vendor notes, due diligence scheduling, and vendor scoring.
+- **User and Access Management**: Migrate the user registry backend and frontend as needed to support authentication, authorization, entity assignment, roles, and access to the migrated VSource, VKey, and VPort applications.
+- **Core Platform Services**: Recreate or migrate required platform services including PostgreSQL/RDS databases, S3 storage, Redis, OpenSearch, ECS/container hosting or equivalent, CI/CD pipelines, secrets management, logging, backup/restore processes, DNS, and TLS configuration.
+
+### Out of Scope
+The following are excluded from this migration unless separately authorized:
+- **VLink** vendor self-service portal
+- **VID** applications, VID-SV classifiers, and VID-specific workflows
+- **Legacy Amplify/AppSync/DynamoDB VKey1** functionality, except where data preservation or one-time reference is required
+- **HR dataset** ingestion and organizational hierarchy work from the VND project
+- **Marketing websites**, landing pages, and empty or test repositories
+- **Major product redesigns** or new feature development beyond what is required to restore existing VSource, VKey, and VPort functionality
+
+### Deliverables
+- Recreated development and hosting environments
+- Migrated VSource, VKey/VKey2, VPort, and required user-registry services
+- Migrated PostgreSQL databases and required S3/OpenSearch/Redis resources
+- CI/CD pipeline setup
+- Secrets, logging, backup, and monitoring configuration
+- Test results and cutover checklist
+
+### Assumptions
+- The existing repositories, AWS account, databases, S3 buckets, Cloudflare DNS, Bitbucket access, and required secrets will be made available.
+- The migration is intended to preserve current functionality, not redesign the product.
+- Any remediation of stale dependencies, infrastructure-as-code creation, Cognito replacement, or legacy DynamoDB data migration will be handled as separate follow-on work unless required for the core migration.
+
+## 6. MIGRATION ROADMAP & CHECKLIST
 The developer will update this checklist state using `[x]` as steps are completed with the AI agent. The AI's scope of response must limit itself exclusively to the active sub-phase.
 **Important Rule:** At the end of every completed step, the AI agent must append a `*Context Note (Completed):*` section detailing any key discoveries, lessons learned, and configuration changes that will be useful for future steps and repositories.
 
@@ -150,3 +185,22 @@ The developer will update this checklist state using `[x]` as steps are complete
   - Author reusable Infrastructure as Code (IaC) structures using HashiCorp Configuration Language (HCL) within the empty `vendex-infra` repo.
 - [ ] **Step 4.3: Secure CI/CD Infrastructure Pipeline Deployment**
   - Integrate Terraform execution inside current AWS CodePipeline/CodeBuild targets to automate sandboxed environments (`develop` and `staging`) before running on live `production` layers.
+
+### PHASE 5: VENDEX ENVIRONMENT MIGRATION (TARGET INFRASTRUCTURE & RUNTIME)
+*Objective: Migrate the VendEx VSource, VKey, and VPort applications to a new development and hosting environment that is easier to maintain, deploy, secure, and scale, excluding VLink and VID-specific components.*
+- [ ] **Step 5.1: Discovery and Environment Audit**
+  - Review current repositories, AWS services, databases, secrets, deployment pipelines, DNS, certificates, and runtime dependencies. Confirm which services are still active and identify any drift from the April 2026 technical handoff.
+- [ ] **Step 5.2: Target Architecture Definition**
+  - Define the new hosting model, repository structure, environment strategy, CI/CD process, database topology, secrets management, observability, and backup approach.
+- [ ] **Step 5.3: Application Migration**
+  - Move the required backend and frontend services into the new development and hosting environment, including vendex-backend-service, vkey2-backend, vkey2frontend, user-registry-backend, and user-registry-frontend where needed.
+- [ ] **Step 5.4: Data Migration and Validation**
+  - Migrate or connect required PostgreSQL databases for VSource, VKey2, VPort, and user registry. Validate referential integrity, permissions, document metadata, product purchases, purchase entries, and VPort materialized analytics.
+- [ ] **Step 5.5: File, Search, and Processing Services**
+  - Reconfigure S3 document storage, thumbnail generation, Textract processing, OpenSearch indexing, Redis caching/pub-sub, and any Lambda or scheduled jobs required by VKey and VPort.
+- [ ] **Step 5.6: Decommissioning Plan for Excluded Systems**
+  - Identify and isolate VLink, VID-specific functionality, legacy Amplify/AppSync dependencies, and unused infrastructure so they are not migrated into the new operating environment.
+- [ ] **Step 5.7: Testing and Cutover**
+  - Perform smoke testing, functional testing, permissions testing, data validation, deployment testing, and rollback planning before moving users to the new environment.
+- [ ] **Step 5.8: Documentation and Handoff**
+  - Produce updated technical documentation covering architecture, deployment, environment configuration, operational runbooks, backup/restore, monitoring, and known limitations.

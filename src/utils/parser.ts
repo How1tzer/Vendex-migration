@@ -88,6 +88,12 @@ export function parseContextMd(filePath: string): Phase[] {
       const line = lines[i];
       const trimmed = line.trim();
 
+      // Reset if we hit a main section header starting with ##
+      if (line.startsWith('## ')) {
+        flushPhase();
+        continue;
+      }
+
       // Check for Phase / FASE header (e.g. ### PHASE 1: ... or ### FASE 4: ...)
       const phaseMatch = line.match(/^###\s+(PHASE|FASE)\s+(\d+):\s*(.*)$/i);
       if (phaseMatch) {

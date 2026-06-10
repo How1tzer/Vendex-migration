@@ -7,14 +7,14 @@ import path from 'path';
 const contextPath = path.resolve('./Context.md');
 const phases = parseContextMd(contextPath);
 
-// Dynamically inject Phase 5: Make it to Production if not present
-if (phases.length === 4) {
+// Dynamically inject Phase 6: Make it to Production if not present
+if (phases.length === 5) {
   phases.push({
-    title: "Phase 5: Make it to Production",
+    title: "Phase 6: Make it to Production",
     objective: "Deploy the sanitized, modernized, and containerized architecture to the live production AWS environment.",
     steps: [
       {
-        id: "5.1",
+        id: "6.1",
         title: "Deploy Orchestrated Stack to AWS ECS",
         completed: false,
         details: [
@@ -22,10 +22,10 @@ if (phases.length === 4) {
           "Verify application behavior and micro-frontend CORS communication."
         ],
         notes: [],
-        rawMarkdown: "- [ ] **Step 5.1: Deploy Orchestrated Stack to AWS ECS**\n  - Deploy modernized Docker containers into AWS ECS tasks."
+        rawMarkdown: "- [ ] **Step 6.1: Deploy Orchestrated Stack to AWS ECS**\n  - Deploy modernized Docker containers into AWS ECS tasks."
       },
       {
-        id: "5.2",
+        id: "6.2",
         title: "Production Routing and DNS Cutover",
         completed: false,
         details: [
@@ -33,7 +33,7 @@ if (phases.length === 4) {
           "Perform final production checks and cut over traffic."
         ],
         notes: [],
-        rawMarkdown: "- [ ] **Step 5.2: Production Routing and DNS Cutover**\n  - Configure SSL/TLS certificates and AWS Route 53 parameters."
+        rawMarkdown: "- [ ] **Step 6.2: Production Routing and DNS Cutover**\n  - Configure SSL/TLS certificates and AWS Route 53 parameters."
       }
     ]
   });
@@ -55,8 +55,8 @@ phases.forEach(p => {
   completedSteps += p.steps.filter(s => s.completed).length;
 });
 
-// Overall progress is weighted: Phase 1 (15%), Phase 2 (20%), Phase 3 (20%), Phase 4 (25%), Phase 5 (20%)
-const weights = [0.15, 0.20, 0.20, 0.25, 0.20];
+// Overall progress is weighted: Phase 1 (15%), Phase 2 (15%), Phase 3 (15%), Phase 4 (15%), Phase 5 (20%), Phase 6 (20%)
+const weights = [0.15, 0.15, 0.15, 0.15, 0.20, 0.20];
 let weightedPercentSum = 0;
 phaseStats.forEach((stat, index) => {
   const weight = weights[index] || 0;
@@ -121,10 +121,13 @@ const allCompletedNotes = phases.flatMap(phase =>
           </span>
         </div>
         <div class="progress-perspective-card" style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.88rem; line-height: 1.5; color: var(--text-primary);">
-          <strong>Progress Perspective:</strong> Phase 1: Isolated Local Environment — 80% Completed (8 out of 10 milestones met). Overall Project Progress is currently tracked at 20% pending subsequent phases.
+          <strong>Progress Perspective:</strong> Phase 1: Isolated Local Environment — {phaseStats[0]?.percent}% Completed ({phases[0]?.steps.filter(s => s.completed).length} out of {phases[0]?.steps.length} milestones met). Overall Project Progress is currently tracked at {initialPercent}% pending subsequent phases.
         </div>
       </div>
     </header>
+
+    <div class="main-layout-grid">
+      <div class="left-column">
 
     <section class="summary-highlights-card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);">
       <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); border: none; padding: 0; background: transparent;">
@@ -248,7 +251,95 @@ const allCompletedNotes = phases.flatMap(phase =>
         </section>
       ))}
     </main>
+  </div> <!-- Close left-column -->
+
+  <div class="sidebar-container">
+    <!-- Objective Card -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title-border">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color);">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Migration Scope & Boundaries
+        </h3>
+      </div>
+      <p class="objective-text">
+        Migrate the VendEx VSource, VKey, and VPort applications to a new development and hosting environment that is easier to maintain, deploy, secure, and scale. The migration will exclude VLink functionality and any VID-specific applications, classifiers, or workflows.
+      </p>
+      
+      <div class="scope-split">
+        <div class="scope-group in-scope">
+          <h4>In Scope</h4>
+          <ul class="scope-list">
+            <li><strong>VSource:</strong> Catalogue capabilities currently served through vendex-backend-service, including vendors, products, market segments, vendor financials, officers, tickers, locations, and corporate actions.</li>
+            <li><strong>VKey / VKey2:</strong> Document management and extraction workflow currently supported by vkey2backend and vkey2-frontend, including secure file upload, document handling, document family groups, product purchases, purchase entries, document metadata, thumbnails, and related AWS processing workflows.</li>
+            <li><strong>VPort:</strong> Portfolio analytics capabilities built on top of VKey2 data, including materialized portfolio views, summaries, spend data, notes, due diligence scheduling, and vendor scoring.</li>
+            <li><strong>User & Access Management:</strong> Registry backend and frontend to support authentication, authorization, roles, and access to migrated apps.</li>
+            <li><strong>Core Platform Services:</strong> PostgreSQL databases, S3 storage, Redis caching, OpenSearch indexing, ECS hosting, CI/CD pipelines, secrets, and TLS configuration.</li>
+          </ul>
+        </div>
+        
+        <div class="scope-group out-scope">
+          <h4>Out of Scope</h4>
+          <ul class="scope-list">
+            <li>VLink vendor self-service portal</li>
+            <li>VID applications, VID-SV classifiers, and VID-specific workflows</li>
+            <li>Legacy Amplify/AppSync/DynamoDB VKey1 functionality (except data preservation)</li>
+            <li>HR dataset ingestion and organizational hierarchy work (VND project)</li>
+            <li>Marketing websites, landing pages, and empty/test repositories</li>
+            <li>Major product redesigns or new features beyond restoring existing functionality</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deliverables Card -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title-border">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success-color);">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="21" x2="18" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          Deliverables
+        </h3>
+      </div>
+      <ul class="deliverables-list">
+        <li>Recreated development and hosting environments</li>
+        <li>Migrated VSource, VKey/VKey2, VPort, and required user-registry services</li>
+        <li>Migrated PostgreSQL databases and required S3/OpenSearch/Redis resources</li>
+        <li>CI/CD pipeline setup</li>
+        <li>Secrets, logging, backup, and monitoring configuration</li>
+        <li>Test results and cutover checklist</li>
+      </ul>
+    </div>
+
+    <!-- Assumptions Card -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title-border">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--pending-color);">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Assumptions
+        </h3>
+      </div>
+      <ul class="assumptions-list">
+        <li>The existing repositories, AWS account, databases, S3 buckets, Cloudflare DNS, Bitbucket access, and required secrets will be made available.</li>
+        <li>The migration is intended to preserve current functionality, not redesign the product.</li>
+        <li>Remediation of stale dependencies, infrastructure-as-code creation, Cognito replacement, or legacy DynamoDB data migration will be handled as separate follow-on work.</li>
+      </ul>
+    </div>
   </div>
+</div> <!-- Close main-layout-grid -->
+  </div> <!-- Close container -->
 </Layout>
 
 <script>
