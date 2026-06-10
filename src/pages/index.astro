@@ -7,37 +7,6 @@ import path from 'path';
 const contextPath = path.resolve('./Context.md');
 const phases = parseContextMd(contextPath);
 
-// Dynamically inject Phase 6: Make it to Production if not present
-if (phases.length === 5) {
-  phases.push({
-    title: "Phase 6: Make it to Production",
-    objective: "Deploy the sanitized, modernized, and containerized architecture to the live production AWS environment.",
-    steps: [
-      {
-        id: "6.1",
-        title: "Deploy Orchestrated Stack to AWS ECS",
-        completed: false,
-        details: [
-          "Deploy modernized Docker containers into AWS ECS tasks.",
-          "Verify application behavior and micro-frontend CORS communication."
-        ],
-        notes: [],
-        rawMarkdown: "- [ ] **Step 6.1: Deploy Orchestrated Stack to AWS ECS**\n  - Deploy modernized Docker containers into AWS ECS tasks."
-      },
-      {
-        id: "6.2",
-        title: "Production Routing and DNS Cutover",
-        completed: false,
-        details: [
-          "Configure SSL/TLS certificates and AWS Route 53 parameters.",
-          "Perform final production checks and cut over traffic."
-        ],
-        notes: [],
-        rawMarkdown: "- [ ] **Step 6.2: Production Routing and DNS Cutover**\n  - Configure SSL/TLS certificates and AWS Route 53 parameters."
-      }
-    ]
-  });
-}
 
 // Compute stats per phase
 const phaseStats = phases.map(phase => {
@@ -129,58 +98,7 @@ const allCompletedNotes = phases.flatMap(phase =>
     <div class="main-layout-grid">
       <div class="left-column">
 
-    <section class="summary-highlights-card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);">
-      <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); border: none; padding: 0; background: transparent;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color);">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-        </svg>
-        Core Architectural Accomplishments
-      </h2>
-      <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; font-size: 0.9rem; line-height: 1.6;">
-        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
-          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Environment Isolation</strong>
-          <span style="color: var(--text-secondary);">Isolated local environments from live AWS production infrastructure using sandboxed Docker containers for databases and caching layers.</span>
-        </div>
-        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
-          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Core Modernization</strong>
-          <span style="color: var(--text-secondary);">Upgraded runtimes to Node 22 (LTS), migrated EOL Apollo Server v3 to v4, standardized the `@aws-sdk/*` layer, and eliminated legacy dependency vulnerabilities.</span>
-        </div>
-        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
-          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Docker Optimization</strong>
-          <span style="color: var(--text-secondary);">Restructured service configurations into secure, multi-stage Docker builds, effectively removing devDependencies from production images to minimize runtime footprint.</span>
-        </div>
-      </div>
-    </section>
 
-    {allCompletedNotes.length > 0 && (
-      <section class="achievements-card">
-        <div class="achievements-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success-color);">
-            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-            <path d="m9 12 2 2 4-4"></path>
-          </svg>
-          <h2>Key Achievements & Findings</h2>
-        </div>
-        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
-          The following technical milestones and configuration summaries have been successfully recorded in the codebase:
-        </p>
-        <div class="achievements-list">
-          {allCompletedNotes.map(item => (
-            <div class="achievement-item">
-              <div class="achievement-meta">
-                <span class="achievement-tag">{item.phaseTitle}</span>
-                <strong>Step {item.stepId}: {item.stepTitle}</strong>
-              </div>
-              <ul class="achievement-notes">
-                {item.notes.map(note => (
-                  <li>{note}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-    )}
 
     <div class="controls">
       <div class="filter-tabs">
@@ -236,12 +154,28 @@ const allCompletedNotes = phases.flatMap(phase =>
                   {/* Render note if it exists from build time */}
                   {step.notes.length > 0 && (
                     <div class="notes-container">
-                      <div class="notes-title">Context Note (From Code)</div>
-                      <ul class="notes-list">
-                        {step.notes.map(note => (
-                          <li>{note}</li>
-                        ))}
-                      </ul>
+                      <button
+                        class="notes-toggle-btn"
+                        aria-expanded="false"
+                        aria-label="Toggle context note"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        Context Note (From Code)
+                        <svg class="notes-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </button>
+                      <div class="notes-body">
+                        <div class="notes-body-inner">
+                          <ul class="notes-list">
+                            {step.notes.map(note => (
+                              <li>{note}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -251,47 +185,113 @@ const allCompletedNotes = phases.flatMap(phase =>
         </section>
       ))}
     </main>
+
+    <section class="summary-highlights-card" style="margin-top: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);">
+      <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); border: none; padding: 0; background: transparent;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color);">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        Core Architectural Accomplishments
+      </h2>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; font-size: 0.9rem; line-height: 1.6;">
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Environment Isolation</strong>
+          <span style="color: var(--text-secondary);">Isolated local environments from live AWS production infrastructure using sandboxed Docker containers for databases and caching layers.</span>
+        </div>
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Core Modernization</strong>
+          <span style="color: var(--text-secondary);">Upgraded runtimes to Node 22 (LTS), migrated EOL Apollo Server v3 to v4, standardized the `@aws-sdk/*` layer, and eliminated legacy dependency vulnerabilities.</span>
+        </div>
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Docker Optimization</strong>
+          <span style="color: var(--text-secondary);">Restructured service configurations into secure, multi-stage Docker builds, effectively removing devDependencies from production images to minimize runtime footprint.</span>
+        </div>
+      </div>
+    </section>
+
+    {allCompletedNotes.length > 0 && (
+      <section class="achievements-card" style="margin-top: 2rem;">
+        <div class="achievements-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success-color);">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <h2>Key Achievements & Findings</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+          The following technical milestones and configuration summaries have been successfully recorded in the codebase:
+        </p>
+        <div class="achievements-list">
+          {allCompletedNotes.map(item => (
+            <div class="achievement-item">
+              <div class="achievement-meta">
+                <span class="achievement-tag">{item.phaseTitle}</span>
+                <strong>Step {item.stepId}: {item.stepTitle}</strong>
+              </div>
+              <ul class="achievement-notes">
+                {item.notes.map(note => (
+                  <li>{note}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
   </div> <!-- Close left-column -->
 
   <div class="sidebar-container">
-    <!-- Objective Card -->
+    <!-- Scope Card (collapsible) -->
     <div class="sidebar-card">
       <div class="sidebar-card-title-border">
-        <h3>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color);">
+        <button
+          id="scopeToggleBtn"
+          class="scope-toggle-btn"
+          aria-expanded="false"
+          aria-controls="scopeBody"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color); flex-shrink: 0;">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="16" x2="12" y2="12"/>
             <line x1="12" y1="8" x2="12.01" y2="8"/>
           </svg>
           Migration Scope & Boundaries
-        </h3>
+          <svg class="scope-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
       </div>
-      <p class="objective-text">
-        Migrate the VendEx VSource, VKey, and VPort applications to a new development and hosting environment that is easier to maintain, deploy, secure, and scale. The migration will exclude VLink functionality and any VID-specific applications, classifiers, or workflows.
-      </p>
-      
-      <div class="scope-split">
-        <div class="scope-group in-scope">
-          <h4>In Scope</h4>
-          <ul class="scope-list">
-            <li><strong>VSource:</strong> Catalogue capabilities currently served through vendex-backend-service, including vendors, products, market segments, vendor financials, officers, tickers, locations, and corporate actions.</li>
-            <li><strong>VKey / VKey2:</strong> Document management and extraction workflow currently supported by vkey2backend and vkey2-frontend, including secure file upload, document handling, document family groups, product purchases, purchase entries, document metadata, thumbnails, and related AWS processing workflows.</li>
-            <li><strong>VPort:</strong> Portfolio analytics capabilities built on top of VKey2 data, including materialized portfolio views, summaries, spend data, notes, due diligence scheduling, and vendor scoring.</li>
-            <li><strong>User & Access Management:</strong> Registry backend and frontend to support authentication, authorization, roles, and access to migrated apps.</li>
-            <li><strong>Core Platform Services:</strong> PostgreSQL databases, S3 storage, Redis caching, OpenSearch indexing, ECS hosting, CI/CD pipelines, secrets, and TLS configuration.</li>
-          </ul>
-        </div>
-        
-        <div class="scope-group out-scope">
-          <h4>Out of Scope</h4>
-          <ul class="scope-list">
-            <li>VLink vendor self-service portal</li>
-            <li>VID applications, VID-SV classifiers, and VID-specific workflows</li>
-            <li>Legacy Amplify/AppSync/DynamoDB VKey1 functionality (except data preservation)</li>
-            <li>HR dataset ingestion and organizational hierarchy work (VND project)</li>
-            <li>Marketing websites, landing pages, and empty/test repositories</li>
-            <li>Major product redesigns or new features beyond restoring existing functionality</li>
-          </ul>
+
+      <div id="scopeBody" class="scope-body">
+        <div class="scope-body-inner">
+          <p class="objective-text">
+            Migrate the VendEx VSource, VKey, and VPort applications to a new development and hosting environment that is easier to maintain, deploy, secure, and scale. The migration will exclude VLink functionality and any VID-specific applications, classifiers, or workflows.
+          </p>
+          
+          <div class="scope-split">
+            <div class="scope-group in-scope">
+              <h4>In Scope</h4>
+              <ul class="scope-list">
+                <li><strong>VSource:</strong> Catalogue capabilities currently served through vendex-backend-service, including vendors, products, market segments, vendor financials, officers, tickers, locations, and corporate actions.</li>
+                <li><strong>VKey / VKey2:</strong> Document management and extraction workflow currently supported by vkey2backend and vkey2-frontend, including secure file upload, document handling, document family groups, product purchases, purchase entries, document metadata, thumbnails, and related AWS processing workflows.</li>
+                <li><strong>VPort:</strong> Portfolio analytics capabilities built on top of VKey2 data, including materialized portfolio views, summaries, spend data, notes, due diligence scheduling, and vendor scoring.</li>
+                <li><strong>User & Access Management:</strong> Registry backend and frontend to support authentication, authorization, roles, and access to migrated apps.</li>
+                <li><strong>Core Platform Services:</strong> PostgreSQL databases, S3 storage, Redis caching, OpenSearch indexing, ECS hosting, CI/CD pipelines, secrets, and TLS configuration.</li>
+              </ul>
+            </div>
+            
+            <div class="scope-group out-scope">
+              <h4>Out of Scope</h4>
+              <ul class="scope-list">
+                <li>VLink vendor self-service portal</li>
+                <li>VID applications, VID-SV classifiers, and VID-specific workflows</li>
+                <li>Legacy Amplify/AppSync/DynamoDB VKey1 functionality (except data preservation)</li>
+                <li>HR dataset ingestion and organizational hierarchy work (VND project)</li>
+                <li>Marketing websites, landing pages, and empty/test repositories</li>
+                <li>Major product redesigns or new features beyond restoring existing functionality</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -410,6 +410,29 @@ const allCompletedNotes = phases.flatMap(phase =>
         });
       });
     });
+
+    // Notes toggle: delegated listener on the phases container
+    const phasesContainer = document.getElementById('phasesContainer');
+    if (phasesContainer) {
+      phasesContainer.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('.notes-toggle-btn') as HTMLButtonElement | null;
+        if (!btn) return;
+        const body = btn.nextElementSibling as HTMLElement | null;
+        if (!body) return;
+        const isExpanded = body.classList.toggle('expanded');
+        btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      });
+    }
+
+    // Scope card toggle
+    const scopeToggleBtn = document.getElementById('scopeToggleBtn');
+    const scopeBody = document.getElementById('scopeBody');
+    if (scopeToggleBtn && scopeBody) {
+      scopeToggleBtn.addEventListener('click', () => {
+        const isExpanded = scopeBody.classList.toggle('expanded');
+        scopeToggleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      });
+    }
   };
 
   // Run initialization robustly
