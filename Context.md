@@ -121,8 +121,11 @@ The developer will update this checklist state using `[x]` as steps are complete
     - Created local `.env` pointing backends to localhost mapping.
     - Added `Password.md` to `.gitignore` to securely backup AWS credentials for future usage.
     - **Port collision resolved**: Both frontends originally targeted port `3002`. `vkey2-frontend` retains `3002`; `user-registry-frontend` was moved to `3003` (`serve.js`, `Dockerfile EXPOSE`, and `webpack.config.js devServer.port` all updated). Docker host mapping must be `-p 3003:3003` for user-registry-frontend.
-- [ ] **Step 1.5: Global Local Orchestration**
+- [x] **Step 1.4b: Local Authentication Mocking (Bypass)**
+  - *Context Note (Completed):* AWS Cognito was securely mocked via client-side localStorage injection using the SuperUser record eduardo.Test@vendexsolutions.com to completely bypass the dummyUserPoolWebClientId12345 EOL validation block while keeping development fully isolated from production.
+- [x] **Step 1.5: Global Local Orchestration**
   - Consolidate a master `docker-compose.yml` file to initialize the local architecture in the precise order mandated by the ECS cluster topology.
+  - *Context Note (Completed):* A unified master `docker-compose.yml` was successfully consolidated, aligning local execution with the ECS cluster topology, mapping all 7 services into a shared mesh network (`vendex-mesh-network`), and effectively resolving local inter-service communication blocks. *Runtime note:* Docker Desktop has been successfully started, and all 10 containers were successfully built, orchestrated, and verified running (details in [ToFix.txt](file:///c:/Users/eduar/OneDrive/Escritorio/Vendex%20Solutions/ToFix.txt)).
 - [x] **Step 1.6: Package Sanitization (user-registry-backend)**
   - Safely update `user-registry-backend` dependencies using `npm update --save`.
   - Maintain `prisma` strictly pinned at `5.22.0` per previous instructions.
@@ -226,6 +229,8 @@ The developer will update this checklist state using `[x]` as steps are complete
 
 ### PHASE 6: MAKE IT TO PRODUCTION
 *Objective: Deploy the sanitized, modernized, and containerized architecture to the live production AWS environment.*
+- [ ] **Step 6.0: Decommission Local Auth Bypasses & Sanitize Frontends**
+  - Developers must completely rip out the temporary localStorage hardcoded bypass in vendex-web-client, restore native AWS Cognito SDK bindings, and point environment variables to the freshly provisioned target AWS User Pools built during Phase 4 before executing any production traffic cutover.
 - [ ] **Step 6.1: Deploy Orchestrated Stack to AWS ECS**
   - Deploy modernized Docker containers into AWS ECS tasks.
   - Verify application behavior and micro-frontend CORS communication in a live production context.

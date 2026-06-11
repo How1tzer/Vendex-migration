@@ -204,7 +204,11 @@ const allCompletedNotes = phases.flatMap(phase =>
         </div>
         <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
           <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Docker Optimization</strong>
-          <span style="color: var(--text-secondary);">Restructured service configurations into secure, multi-stage Docker builds, effectively removing devDependencies from production images to minimize runtime footprint.</span>
+          <span style="color: var(--text-secondary);">Restructured all service configurations (backends and frontends) into secure, multi-stage Docker builds, effectively removing devDependencies from production images to minimize runtime footprint.</span>
+        </div>
+        <div style="padding: 1rem; background: rgba(120, 110, 90, 0.05); border-left: 4px solid var(--accent-color); border-radius: 0 8px 8px 0;">
+          <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Frontend Container Standardization</strong>
+          <span style="color: var(--text-secondary);">Upgraded vkey2-frontend to Node 22 (LTS) via node:22-alpine, migrated Docker image to native pnpm via corepack for dependency lock fidelity, and enforced cluster-wide engine constraints in package.json.</span>
         </div>
       </div>
     </section>
