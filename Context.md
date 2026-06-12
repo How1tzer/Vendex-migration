@@ -186,16 +186,28 @@ The developer will update this checklist state using `[x]` as steps are complete
     - Rewrote the Dockerfile into a multi-stage build to isolate the build environment from the production environment, drastically reducing the image footprint.
     - Replaced `npm install` with `pnpm install` natively utilizing `corepack`, ensuring dependencies lock faithfully to the cluster's constraints.
     - Appended `"engines": { "node": ">=22.0.0 <23.0.0" }` in `package.json` to enforce consistency.
-- [ ] **Step 2.3: Cross-Version Integration Testing**
+- [x] **Step 2.3: Cross-Version Integration Testing**
   - Verify inside local Docker containers that runtime upgrades did not break token-passing mechanisms between the shell application and embedded iframes.
+  - *Context Note (Completed):*
+    - **Iframe Loading & Route Fixes:** Configured `GRAPHQL_URL` and base path redirects to resolve root SPA access 404s inside the nested iframe frames.
+    - **Mock Authorization Alignment:** Resolved authorization blocks by mapping proper local roles to the mock SuperUser (`eduardo.Test@vendexsolutions.com`) across `user-registry-backend`, `vkey2-backend`, and `vendex-web-client`. Added `VKey2-Analyst`, `VKey2-Read-Only`, `VPort-Client-User`, and `VPort-VendEx-Analyst` roles to bypass local permission checks.
+    - **Verification:** Successfully verified that both VKey2 (Secure Vault, Documents, DFGs, Purchases) and User Admin dashboards render and request data correctly without loading blocks or network failures.
 
 ### PHASE 3: CLEANUP, SECURITY PATCHING & SANITIZATION
 *Objective: Remove dead code paths and address vulnerabilities in code distribution channels.*
-- [ ] **Step 3.1: Stabilizing SDK Package Distribution**
+- [x] **Step 3.1: Stabilizing SDK Package Distribution**
   - Deprecate the fragile practice of fetching `.tgz` files via SSH from the `vdx-sdk` repo.
   - Configure a secure local or private npm package registry to stabilize builds across deployment pipelines.
-- [ ] **Step 3.2: Code Dead-Weight Removal**
+  - *Context Note (Completed):*
+    - **Local Registry Setup:** Added `verdaccio.local` to `docker-compose.yml` to serve as a private NPM registry on port `4873`.
+    - **SDK Publishing Pipeline:** Updated `vdx-sdk/release.sh` to compile Typescript and securely run `npm publish` to Verdaccio, removing the legacy `.tgz` packing approach. Also fixed tsconfig ES2022/esModuleInterop compilation blockers.
+    - **Backend Refactoring:** Stripped custom `cloneVdxSDK` bash commands from `user-registry-backend` and `vkey2-backend`. Updated their Dockerfiles and `package-lock.json` configurations to natively resolve `"vdx-sdk": "^5.5.0"` directly from the Verdaccio registry over the Docker network using `host.docker.internal:4873`.
+- [x] **Step 3.2: Code Dead-Weight Removal**
   - Review remaining dependencies on DynamoDB (VKey1) to establish their complete deprecation from backend initialization files.
+  - *Context Note (Completed):*
+    - **Dependency Purge:** Removed `@aws-sdk/client-dynamodb`, `@aws-sdk/lib-dynamodb`, and `@aws-sdk/util-dynamodb` from `vendex-backend-service/package.json`.
+    - **File Deletion:** Completely deleted `DynamoDBConnector.ts`, `dynamoDb.ts` type definitions, and `vkey-document-utils.ts` utility files.
+    - **Graceful Resolver Deprecation:** Maintained the GraphQL schema endpoints for `UploadVKeyDocumentTrackerData`, `DeleteVKeyDocument`, `GetAgreements`, and `GetAgreement` to prevent Apollo Client crashes on legacy frontends. Stripped out all internal AWS DynamoDB persistence logic and legacy S3 deletion routines, replacing them with a strict deprecation error. Verified successful `npm run build` compilation.
 - [ ] **Step 3.3: Resolving Critical Bug VEN-398**
   - Isolate and fix the legacy contract processing bug in production utilizing the newly modernized local architecture.
 
